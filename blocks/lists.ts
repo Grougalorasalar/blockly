@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.libraryBlocks.lists');
+// Former goog.module ID: Blockly.libraryBlocks.lists
 
 import * as fieldRegistry from '../core/field_registry.js';
 import * as xmlUtils from '../core/utils/xml.js';
@@ -112,8 +111,12 @@ export const blocks = createBlockDefinitionsFromJsonArray([
   },
 ]);
 
-/** Type of a 'lists_create_with' block. */
-type CreateWithBlock = Block & ListCreateWithMixin;
+/**
+ * Type of a 'lists_create_with' block.
+ *
+ * @internal
+ */
+export type CreateWithBlock = Block & ListCreateWithMixin;
 interface ListCreateWithMixin extends ListCreateWithMixinType {
   itemCount_: number;
 }

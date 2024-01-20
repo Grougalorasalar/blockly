@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.Tooltip');
+// Former goog.module ID: Blockly.Tooltip
 
 import * as browserEvents from './browser_events.js';
 import * as common from './common.js';
@@ -185,7 +184,7 @@ function getTargetObject(
  * Create the tooltip div and inject it onto the page.
  */
 export function createDom() {
-  if (containerDiv) {
+  if (document.querySelector('.blocklyTooltipDiv')) {
     return; // Already created.
   }
   // Create an HTML container for popup overlays (e.g. editor widgets).

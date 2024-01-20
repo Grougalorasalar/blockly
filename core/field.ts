@@ -11,8 +11,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.Field');
+// Former goog.module ID: Blockly.Field
 
 // Unused import preserved for side-effects. Remove if unneeded.
 import './events/events_block_change.js';
@@ -332,6 +331,18 @@ export abstract class Field<T = any>
   initModel() {}
 
   /**
+   * Defines whether this field should take up the full block or not.
+   *
+   * Be cautious when overriding this function. It may not work as you expect /
+   * intend because the behavior was kind of hacked in. If you are thinking
+   * about overriding this function, post on the forum with your intended
+   * behavior to see if there's another approach.
+   */
+  protected isFullBlockField(): boolean {
+    return !this.borderRect_;
+  }
+
+  /**
    * Create a field border rect element. Not to be overridden by subclasses.
    * Instead modify the result of the function inside initView, or create a
    * separate function to call.
@@ -571,6 +582,20 @@ export abstract class Field<T = any>
   }
 
   /**
+   * Check whether the field should be clickable while the block is in a flyout.
+   * The default is that fields are clickable in always-open flyouts such as the
+   * simple toolbox, but not in autoclosing flyouts such as the category toolbox.
+   * Subclasses may override this function to change this behavior. Note that
+   * `isClickable` must also return true for this to have any effect.
+   *
+   * @param autoClosingFlyout true if the containing flyout is an auto-closing one.
+   * @returns Whether the field should be clickable while the block is in a flyout.
+   */
+  isClickableInFlyout(autoClosingFlyout: boolean): boolean {
+    return !autoClosingFlyout;
+  }
+
+  /**
    * Check whether this field is currently editable.  Some fields are never
    * EDITABLE (e.g. text labels). Other fields may be EDITABLE but may exist on
    * non-editable blocks or be currently disabled.
@@ -798,9 +823,9 @@ export abstract class Field<T = any>
     const xOffset =
       margin !== undefined
         ? margin
-        : this.borderRect_
-        ? this.getConstants()!.FIELD_BORDER_RECT_X_PADDING
-        : 0;
+        : !this.isFullBlockField()
+          ? this.getConstants()!.FIELD_BORDER_RECT_X_PADDING
+          : 0;
     let totalWidth = xOffset * 2;
     let totalHeight = constants!.FIELD_TEXT_HEIGHT;
 
@@ -814,7 +839,7 @@ export abstract class Field<T = any>
       );
       totalWidth += contentWidth;
     }
-    if (this.borderRect_) {
+    if (!this.isFullBlockField()) {
       totalHeight = Math.max(totalHeight, constants!.FIELD_BORDER_RECT_HEIGHT);
     }
 
@@ -923,7 +948,7 @@ export abstract class Field<T = any>
       throw new UnattachedFieldError();
     }
 
-    if (!this.borderRect_) {
+    if (this.isFullBlockField()) {
       // Browsers are inconsistent in what they return for a bounding box.
       // - Webkit / Blink: fill-box / object bounding box
       // - Gecko: stroke-box
@@ -941,13 +966,21 @@ export abstract class Field<T = any>
         xy.y -= 0.5 * scale;
       }
     } else {
-      const bBox = this.borderRect_.getBoundingClientRect();
-      xy = style.getPageOffset(this.borderRect_);
+      const bBox = this.borderRect_!.getBoundingClientRect();
+      xy = style.getPageOffset(this.borderRect_!);
       scaledWidth = bBox.width;
       scaledHeight = bBox.height;
     }
     return new Rect(xy.y, xy.y + scaledHeight, xy.x, xy.x + scaledWidth);
   }
+
+  /**
+   * Notifies the field that it has changed locations.
+   *
+   * @param _ The location of this field's block's top-start corner
+   *     in workspace coordinates.
+   */
+  onLocationChange(_: Coordinate) {}
 
   /**
    * Get the text from this field to display on the block. May differ from

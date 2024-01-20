@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as goog from '../../../closure/goog/goog.js';
-goog.declareModuleId('Blockly.zelos.ConstantProvider');
+// Former goog.module ID: Blockly.zelos.ConstantProvider
 
 import {ConnectionType} from '../../connection_type.js';
 import type {RenderedConnection} from '../../rendered_connection.js';
@@ -218,9 +217,9 @@ export class ConstantProvider extends BaseConstantProvider {
 
     this.FIELD_DROPDOWN_SVG_ARROW_PADDING = this.FIELD_BORDER_RECT_X_PADDING;
 
-    this.FIELD_COLOUR_DEFAULT_WIDTH = 2 * this.GRID_UNIT;
+    this.FIELD_COLOUR_DEFAULT_WIDTH = 6 * this.GRID_UNIT;
 
-    this.FIELD_COLOUR_DEFAULT_HEIGHT = 4 * this.GRID_UNIT;
+    this.FIELD_COLOUR_DEFAULT_HEIGHT = 8 * this.GRID_UNIT;
 
     this.FIELD_CHECKBOX_X_OFFSET = 1 * this.GRID_UNIT;
 

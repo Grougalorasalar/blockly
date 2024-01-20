@@ -10,8 +10,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.dropDownDiv');
+// Former goog.module ID: Blockly.dropDownDiv
 
 import type {BlockSvg} from './block_svg.js';
 import * as common from './common.js';
@@ -114,7 +113,7 @@ export interface PositionMetrics {
  * @internal
  */
 export function createDom() {
-  if (div) {
+  if (document.querySelector('.blocklyDropDownDiv')) {
     return; // Already created.
   }
   div = document.createElement('div');

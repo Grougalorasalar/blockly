@@ -9,8 +9,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.BubbleDragger');
+// Former goog.module ID: Blockly.BubbleDragger
 
 import {ComponentManager} from './component_manager.js';
 import type {CommentMove} from './events/events_comment_move.js';
@@ -21,6 +20,7 @@ import type {IDragTarget} from './interfaces/i_drag_target.js';
 import {Coordinate} from './utils/coordinate.js';
 import {WorkspaceCommentSvg} from './workspace_comment_svg.js';
 import type {WorkspaceSvg} from './workspace_svg.js';
+import * as layers from './layers.js';
 
 /**
  * Class for a bubble dragger.  It moves things on the bubble canvas around the
@@ -64,6 +64,8 @@ export class BubbleDragger {
     if ((this.bubble as AnyDuringMigration).setAutoLayout) {
       (this.bubble as AnyDuringMigration).setAutoLayout(false);
     }
+
+    this.workspace.getLayerManager()?.moveToDragLayer(this.bubble);
 
     this.bubble.setDragging && this.bubble.setDragging(true);
   }
@@ -164,6 +166,9 @@ export class BubbleDragger {
       // Put everything back onto the bubble canvas.
       if (this.bubble.setDragging) {
         this.bubble.setDragging(false);
+        this.workspace
+          .getLayerManager()
+          ?.moveOffDragLayer(this.bubble, layers.BUBBLE);
       }
       this.fireMoveEvent_();
     }

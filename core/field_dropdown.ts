@@ -11,8 +11,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.FieldDropdown');
+// Former goog.module ID: Blockly.FieldDropdown
 
 import type {BlockSvg} from './block_svg.js';
 import * as dropDownDiv from './dropdowndiv.js';
@@ -279,12 +278,8 @@ export class FieldDropdown extends Field<string> {
     dom.addClass(menuElement, 'blocklyDropdownMenu');
 
     if (this.getConstants()!.FIELD_DROPDOWN_COLOURED_DIV) {
-      const primaryColour = block.isShadow()
-        ? block.getParent()!.getColour()
-        : block.getColour();
-      const borderColour = block.isShadow()
-        ? (block.getParent() as BlockSvg).style.colourTertiary
-        : (this.sourceBlock_ as BlockSvg).style.colourTertiary;
+      const primaryColour = block.getColour();
+      const borderColour = (this.sourceBlock_ as BlockSvg).style.colourTertiary;
       dropDownDiv.setColour(primaryColour, borderColour);
     }
 

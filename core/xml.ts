@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.Xml');
+// Former goog.module ID: Blockly.Xml
 
 import type {Block} from './block.js';
 import type {BlockSvg} from './block_svg.js';
@@ -593,7 +592,6 @@ export function domToBlockInternal(
           topBlockSvg.setConnectionTracking(true);
         }
       }, 1);
-      topBlockSvg.updateDisabled();
       // Allow the scrollbars to resize and move based on the new contents.
       // TODO(@picklesrus): #387. Remove when domToBlock avoids resizing.
       (workspace as WorkspaceSvg).resizeContents();

@@ -10,8 +10,7 @@
  *
  * @class
  */
-import * as goog from '../../closure/goog/goog.js';
-goog.declareModuleId('Blockly.Events.BlockFieldIntermediateChange');
+// Former goog.module ID: Blockly.Events.BlockFieldIntermediateChange
 
 import type {Block} from '../block.js';
 import * as registry from '../registry.js';
@@ -122,6 +121,36 @@ export class BlockFieldIntermediateChange extends BlockBase {
    */
   override isNull(): boolean {
     return this.oldValue === this.newValue;
+  }
+
+  /**
+   * Run a change event.
+   *
+   * @param forward True if run forward, false if run backward (undo).
+   */
+  override run(forward: boolean) {
+    const workspace = this.getEventWorkspace_();
+    if (!this.blockId) {
+      throw new Error(
+        'The block ID is undefined. Either pass a block to ' +
+          'the constructor, or call fromJson',
+      );
+    }
+    const block = workspace.getBlockById(this.blockId);
+    if (!block) {
+      throw new Error(
+        'The associated block is undefined. Either pass a ' +
+          'block to the constructor, or call fromJson',
+      );
+    }
+
+    const value = forward ? this.newValue : this.oldValue;
+    const field = block.getField(this.name!);
+    if (field) {
+      field.setValue(value);
+    } else {
+      console.warn("Can't set non-existent field: " + this.name);
+    }
   }
 }
 

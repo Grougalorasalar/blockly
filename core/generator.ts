@@ -10,8 +10,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.CodeGenerator');
+// Former goog.module ID: Blockly.CodeGenerator
 
 import type {Block} from './block.js';
 import * as common from './common.js';
@@ -20,8 +19,10 @@ import type {Workspace} from './workspace.js';
 import {warn} from './utils/deprecation.js';
 
 /**
- * Type declaration for per-block-type generator functions.
+ * Deprecated, no-longer used type declaration for per-block-type generator
+ * functions.
  *
+ * @deprecated
  * @see {@link https://developers.google.com/blockly/guides/create-custom-blocks/generating-code}
  * @param block The Block instance to generate code for.
  * @param genearator The CodeGenerator calling the function.
@@ -40,8 +41,25 @@ export type BlockGenerator = (
 export class CodeGenerator {
   name_: string;
 
-  /** A dictionary of block generator functions keyed by block type. */
-  forBlock: {[type: string]: BlockGenerator} = Object.create(null);
+  /**
+   * A dictionary of block generator functions, keyed by block type.
+   * Each block generator function takes two parameters:
+   *
+   * - the Block to generate code for, and
+   * - the calling CodeGenerator (or subclass) instance, so the
+   *   function can call methods defined below (e.g. blockToCode) or
+   *   on the relevant subclass (e.g. JavascripGenerator),
+   *
+   * and returns:
+   *
+   * - a [code, precedence] tuple (for value/expression blocks), or
+   * - a string containing the generated code (for statement blocks), or
+   * - null if no code should be emitted for block.
+   */
+  forBlock: Record<
+    string,
+    (block: Block, generator: this) => [string, number] | string | null
+  > = Object.create(null);
 
   /**
    * This is used as a placeholder in functions defined using
@@ -109,7 +127,7 @@ export class CodeGenerator {
   protected functionNames_: {[key: string]: string} = Object.create(null);
 
   /** A database of variable and procedure names. */
-  protected nameDB_?: Names = undefined;
+  nameDB_?: Names = undefined;
 
   /** @param name Language name of this generator. */
   constructor(name: string) {
@@ -249,7 +267,7 @@ export class CodeGenerator {
     }
     if (typeof func !== 'function') {
       throw Error(
-        `${this.name_} generator does not know how to generate code` +
+        `${this.name_} generator does not know how to generate code ` +
           `for block type "${block.type}".`,
       );
     }
@@ -493,6 +511,42 @@ export class CodeGenerator {
       this.definitions_[desiredName] = codeText;
     }
     return this.functionNames_[desiredName];
+  }
+
+  /**
+   * Gets a unique, legal name for a user-defined variable.
+   * Before calling this method, the `nameDB_` property of the class
+   * must have been initialized already. This is typically done in
+   * the `init` function of the code generator class.
+   *
+   * @param nameOrId The ID of the variable to get a name for,
+   *    or the proposed name for a variable not associated with an id.
+   * @returns A unique, legal name for the variable.
+   */
+  getVariableName(nameOrId: string): string {
+    return this.getName(nameOrId, NameType.VARIABLE);
+  }
+
+  /**
+   * Gets a unique, legal name for a user-defined procedure.
+   * Before calling this method, the `nameDB_` property of the class
+   * must have been initialized already. This is typically done in
+   * the `init` function of the code generator class.
+   *
+   * @param name The proposed name for a procedure.
+   * @returns A unique, legal name for the procedure.
+   */
+  getProcedureName(name: string): string {
+    return this.getName(name, NameType.PROCEDURE);
+  }
+
+  private getName(nameOrId: string, type: NameType): string {
+    if (!this.nameDB_) {
+      throw new Error(
+        'Name database is not defined. You must initialize `nameDB_` in your generator class and call `init` first.',
+      );
+    }
+    return this.nameDB_.getName(nameOrId, type);
   }
 
   /**

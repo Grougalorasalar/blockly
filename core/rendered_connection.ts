@@ -9,8 +9,7 @@
  *
  * @class
  */
-import * as goog from '../closure/goog/goog.js';
-goog.declareModuleId('Blockly.RenderedConnection');
+// Former goog.module ID: Blockly.RenderedConnection
 
 import type {Block} from './block.js';
 import type {BlockSvg} from './block_svg.js';
@@ -25,7 +24,6 @@ import * as internalConstants from './internal_constants.js';
 import {Coordinate} from './utils/coordinate.js';
 import * as dom from './utils/dom.js';
 import {Svg} from './utils/svg.js';
-import * as svgMath from './utils/svg_math.js';
 import * as svgPaths from './utils/svg_paths.js';
 
 /** A shape that has a pathDown property. */
@@ -93,6 +91,10 @@ export class RenderedConnection extends Connection {
     super.dispose();
     if (this.trackedState === RenderedConnection.TrackedState.TRACKED) {
       this.db.removeConnection(this, this.y);
+    }
+    if (this.highlightPath) {
+      dom.removeNode(this.highlightPath);
+      this.highlightPath = null;
     }
   }
 
@@ -265,27 +267,6 @@ export class RenderedConnection extends Connection {
    */
   getOffsetInBlock(): Coordinate {
     return this.offsetInBlock;
-  }
-
-  /**
-   * Move the blocks on either side of this connection right next to each other.
-   *
-   * @internal
-   */
-  tighten() {
-    const dx = this.targetConnection!.x - this.x;
-    const dy = this.targetConnection!.y - this.y;
-    if (dx !== 0 || dy !== 0) {
-      const block = this.targetBlock();
-      const svgRoot = block!.getSvgRoot();
-      if (!svgRoot) {
-        throw Error('block is not rendered.');
-      }
-      // Workspace coordinates.
-      const xy = svgMath.getRelativeXY(svgRoot);
-      block!.translate(xy.x - dx, xy.y - dy);
-      block!.moveConnections(-dx, -dy);
-    }
   }
 
   /**
